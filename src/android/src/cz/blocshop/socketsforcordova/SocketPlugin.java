@@ -40,32 +40,39 @@ public class SocketPlugin extends CordovaPlugin {
 
     @Override
     public boolean execute(String action, CordovaArgs args, CallbackContext callbackContext) throws JSONException {
-
-        if (action.equals("open")) {
-            this.open(args, callbackContext);
-        } else if (action.equals("write")) {
-            this.write(args, callbackContext);
-        } else if (action.equals("shutdownWrite")) {
-            this.shutdownWrite(args, callbackContext);
-        } else if (action.equals("close")) {
-            this.close(args, callbackContext);
-        } else if (action.equals("setOptions")) {
-            this.setOptions(args, callbackContext);
-        } else {
-            callbackContext.error(String.format("SocketPlugin - invalid action:", action));
+        try {
+            if (action.equals("open")) {
+                this.open(args, callbackContext);
+            } else if (action.equals("write")) {
+                this.write(args, callbackContext);
+            } else if (action.equals("shutdownWrite")) {
+                this.shutdownWrite(args, callbackContext);
+            } else if (action.equals("close")) {
+                this.close(args, callbackContext);
+            } else if (action.equals("setOptions")) {
+                this.setOptions(args, callbackContext);
+            } else {
+                callbackContext.error(String.format("SocketPlugin - invalid action:", action));
+                return false;
+            }
+            return true;
+        } catch (Exception e) {
+            callbackContext.error(String.format("SocketPlugin - error in action %s. %s:", action, e.getMessage()));
             return false;
         }
-        return true;
+
     }
 
-    private void open(CordovaArgs args, CallbackContext callbackContext) throws JSONException {
+    private void open(CordovaArgs args, CallbackContext callbackContext) throws JSONException, IOException {
         String socketKey = args.getString(0);
         String host = args.getString(1);
         int port = args.getInt(2);
+        JSONObject options = args.getJSONObject(3);
+        int targetInterface = options.getInt("targetInterface");
 
         Log.d("SocketPlugin", "Open socket plugin");
 
-        SocketAdapter socketAdapter = new SocketAdapterImpl();
+        SocketAdapter socketAdapter = new SocketAdapterImpl(targetInterface, cordova.getContext());
         socketAdapter.setCloseEventHandler(new CloseEventHandler(socketKey));
         socketAdapter.setDataConsumer(new DataConsumer(socketKey));
         socketAdapter.setErrorEventHandler(new ErrorEventHandler(socketKey));
