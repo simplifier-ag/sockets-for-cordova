@@ -47,7 +47,7 @@ Socket.prototype.open = function (host, port, success, error, options) {
     error = error || function () {
         };
 
-    option = options || {
+    options = options || {
     	targetInterface : -1
     	};
 
