@@ -40,12 +40,16 @@ function Socket() {
     this.socketKey = guid();
 }
 
-Socket.prototype.open = function (host, port, success, error) {
+Socket.prototype.open = function (host, port, success, error, options) {
 
     success = success || function () {
         };
     error = error || function () {
         };
+
+    option = options || {
+    	targetInterface : -1
+    	};
 
     if (!this._ensureState(Socket.State.CLOSED, error)) {
         return;
@@ -96,7 +100,8 @@ Socket.prototype.open = function (host, port, success, error) {
         [
             this.socketKey,
             host,
-            port
+            port,
+            options
         ]);
 };
 

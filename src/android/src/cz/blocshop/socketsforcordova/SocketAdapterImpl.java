@@ -17,11 +17,23 @@
 
 package cz.blocshop.socketsforcordova;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.util.Log;
+import android.widget.Toast;
+
 import java.io.IOException;
+import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.NetworkInterface;
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.net.SocketException;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -29,6 +41,7 @@ import java.util.concurrent.Future;
 
 
 public class SocketAdapterImpl implements SocketAdapter {
+    private static final String TAG = "SocketAdapterImpl";
     
     private final int INPUT_STREAM_BUFFER_SIZE = 16 * 1024;
     private final Socket socket;
@@ -41,9 +54,24 @@ public class SocketAdapterImpl implements SocketAdapter {
     
     private ExecutorService executor;
 
-    public SocketAdapterImpl() {
-        this.socket = new Socket();
+    public SocketAdapterImpl(int transportInterface, Context context) throws IOException, NullPointerException {
+        Network targetNetwork = getTagetNetwork(transportInterface, context);
+        if (targetNetwork != null) {
+            this.socket = targetNetwork.getSocketFactory().createSocket();
+        } else {
+            this.socket = new Socket();
+        }
         this.executor = Executors.newSingleThreadExecutor();
+    }
+
+    private Network getTagetNetwork(int transportInterface, Context context){
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        for(Network network : connectivityManager.getAllNetworks()){
+            if(connectivityManager.getNetworkCapabilities(network).hasTransport(transportInterface)){
+                return network;
+            }
+        }
+        return null;
     }
 
     @Override

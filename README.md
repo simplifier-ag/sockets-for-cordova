@@ -10,11 +10,11 @@ You can also get information about this plugin from our blog post http://www.blo
 
 Install this plugin simply by:
 
-`cordova plugin add cz.blocshop.socketsforcordova`
+`cordova plugin add https://github.com/simplifier-ag/sockets-for-cordova.git#v1.6.1`
 
 or you can use GIT repository for most recent version:
 
-`cordova plugin add https://github.com/blocshop/sockets-for-cordova`
+`cordova plugin add https://github.com/simplifier-ag/sockets-for-cordova.git`
 
 ## Sample usage
 Here is simple example of how to connect to remote server, consume data from it and close the connection.
@@ -46,7 +46,9 @@ socket.open(
   },
   function(errorMessage) {
     // invoked after unsuccessful opening of socket
-  });
+  },
+  {targetInterface: 3} // Android, optional, 3 = TRANSPORT_ETHERNET
+  );
 ```
 
 Send "Hello world" to server:
@@ -108,6 +110,7 @@ Establishes connection with the remote host.
 | `port`      | `number`                    | Tcp port number |
 | `onSuccess` | `() => void`                | Success callback - called after successfull connection to the remote host. (optional)|
 | `onError`   | `(message: string) => void` | Error callback - called when some error occurs during connecting to the remote host. (optional)|
+| `options`      | `object`                    | transportInterface::Integer - defines transport layer of the socket ( [Integer that represents the transport-id](https://developer.android.com/reference/android/net/NetworkCapabilities#TRANSPORT_BLUETOOTH), e. g. 3 = Ethernet) |
 
 #### `write(data, onSuccess?, onError?): void`
 Sends data to remote host.
@@ -165,3 +168,4 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  - 1.5.3 - added Android open and write timeouts [Android]
  - 1.5.4 - fixed iOS closing sockets on open timeout [iOS]
  - 1.6.0 - close old existing sockets on reopen by destination ports. Removed iOS trash sources [iOS, Android]
+ - 1.6.1 - added target interface options for android
