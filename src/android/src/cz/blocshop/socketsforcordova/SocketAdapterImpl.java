@@ -104,8 +104,8 @@ public class SocketAdapterImpl implements SocketAdapter {
     
     @Override
     public void close() throws IOException {
-    	this.invokeCloseEventHandler(false);
     	this.socket.close();
+    	this.invokeCloseEventHandler(false);
     }
 
     @Override
